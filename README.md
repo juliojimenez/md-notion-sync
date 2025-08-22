@@ -14,12 +14,12 @@ A TypeScript/Node.js package to sync markdown files to Notion pages with proper 
 ## Installation
 
 ```bash
-npm install markdown-notion-sync
+npm install md-notion-sync
 ```
 
 For global CLI usage:
 ```bash
-npm install -g markdown-notion-sync
+npm install -g md-notion-sync
 ```
 
 ## Quick Start
@@ -44,7 +44,7 @@ md-notion-sync sync -f README.md -p your_notion_page_id
 ### Programmatic Usage
 
 ```typescript
-import { syncMarkdownToNotion } from 'markdown-notion-sync';
+import { syncMarkdownToNotion } from 'md-notion-sync';
 
 await syncMarkdownToNotion({
   notionToken: 'your_notion_token',
@@ -57,7 +57,7 @@ await syncMarkdownToNotion({
 ### Advanced Usage
 
 ```typescript
-import { NotionSync, MarkdownToNotion } from 'markdown-notion-sync';
+import { NotionSync, MarkdownToNotion } from 'md-notion-sync';
 
 // Create converter and sync instances
 const converter = new MarkdownToNotion();
@@ -92,7 +92,7 @@ jobs:
           node-version: '18'
       
       - name: Install package
-        run: npm install -g markdown-notion-sync
+        run: npm install -g md-notion-sync
       
       - name: Sync to Notion
         run: md-notion-sync sync -f README.md -p ${{ secrets.NOTION_PAGE_ID }}
@@ -116,8 +116,8 @@ Options:
   -f, --file <path>     Path to markdown file (required)
   -p, --page-id <id>    Notion page ID (required)
   -t, --token <token>   Notion API token (or use NOTION_TOKEN env var)
-  --no-clear           Don't clear existing content before syncing
-  -h, --help           Display help for command
+  --no-clear            Don't clear existing content before syncing
+  -h, --help            Display help for command
 ```
 
 ## Supported Markdown Features
