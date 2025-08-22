@@ -5,7 +5,7 @@ This is a test markdown file for testing the converter.
 ## Features
 
 - **Bold text** support
-- *Italic text* support  
+- *Italic text* support
 - `Inline code` support
 - [External links](https://example.com)
 
