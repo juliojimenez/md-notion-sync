@@ -1,5 +1,5 @@
 import { NotionSync, NotionBlock } from '../src/index';
-import { Client } from '@notionhq/client';
+// import { Client } from '@notionhq/client';
 
 // Mock the Notion client
 jest.mock('@notionhq/client', () => {

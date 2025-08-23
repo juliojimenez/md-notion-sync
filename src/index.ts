@@ -1,6 +1,6 @@
 import { Client } from '@notionhq/client';
 import fs from 'fs';
-import path from 'path';
+// import path from 'path';
 
 // Define compatible types for Notion blocks
 export interface NotionRichText {
@@ -57,18 +57,20 @@ export class MarkdownToNotion {
       return false; // Skip these types of links
     }
     
+    let processedUrl = url;
+    
     // Ensure URL has a protocol
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       if (url.includes('.') && !url.includes(' ') && url.length > 3) {
-        url = 'https://' + url; // Add https:// to domain-like strings
+        processedUrl = 'https://' + url; // Add https:// to domain-like strings
       } else {
         return false; // Skip invalid URLs
       }
     }
     
     try {
-      new URL(url);
-      return url;
+      new URL(processedUrl);
+      return processedUrl; // Return the processed URL with protocol
     } catch {
       return false;
     }
@@ -78,8 +80,6 @@ export class MarkdownToNotion {
     const richText: RichTextElement[] = [];
     // First pass: remove unwanted link types completely
     let processedText = text;
-    
-    console.log('Original text:', text);
     
     // More comprehensive regex patterns for removal
     // Remove nested image-links: [![alt](img-url)](link-url)
@@ -97,8 +97,6 @@ export class MarkdownToNotion {
     // Clean up any double spaces and trim
     processedText = processedText.replace(/\s+/g, ' ').trim();
     
-    console.log('Final processed text:', processedText);
-    
     // If after all removals the text is empty or just whitespace, return empty array
     if (!processedText || processedText.trim() === '') {
       return [];
@@ -107,7 +105,7 @@ export class MarkdownToNotion {
     // Now process remaining formatting (bold, italic, code, valid links)
     const parts = processedText.split(/(\*\*[^*]+?\*\*|\*[^*]+?\*|`[^`]+?`|\[[^\]]+?\]\([^)]+?\))/);
     
-    for (let part of parts) {
+    for (const part of parts) {
       if (!part) continue;
       
       if (part.startsWith('**') && part.endsWith('**')) {
@@ -147,13 +145,14 @@ export class MarkdownToNotion {
         const linkUrl = linkMatch[2];
         
         // Double-check that this isn't an unwanted link type
+        const validUrl = this.isValidUrl(linkUrl);
         if (!linkUrl.startsWith('#') && 
             !linkUrl.startsWith('./') && 
             !linkUrl.startsWith('../') &&
-            this.isValidUrl(linkUrl)) {
+            validUrl) {
           richText.push({
             type: 'text',
-            text: { content: linkText, link: { url: linkUrl } }
+            text: { content: linkText, link: { url: validUrl } }
           });
         } else {
           // If it's an unwanted link, just add the text content
@@ -177,7 +176,7 @@ export class MarkdownToNotion {
   }
 
   private parseTable(tableLines: string[]): NotionBlock | null {
-    const rows = tableLines.filter(line => line.trim() && !line.match(/^\|[\s\-\|:]+\|$/));
+    const rows = tableLines.filter(line => line.trim() && !line.match(/^\|[\s\-|:]+\|$/));
     if (rows.length < 2) return null;
     
     const parseRow = (row: string) => {
@@ -219,8 +218,8 @@ export class MarkdownToNotion {
 
   private parseCodeBlock(lines: string[], startIndex: number): { blocks: NotionBlock[]; endIndex: number } {
     let endIndex = startIndex + 1;
-    let language = lines[startIndex].replace(/^```/, '').trim() || 'plain text';
-    let codeContent: string[] = [];
+    const language = lines[startIndex].replace(/^```/, '').trim() || 'plain text';
+    const codeContent: string[] = [];
     
     while (endIndex < lines.length && !lines[endIndex].startsWith('```')) {
       codeContent.push(lines[endIndex]);
@@ -267,17 +266,20 @@ export class MarkdownToNotion {
     
     while (currentIndex < lines.length) {
       const line = lines[currentIndex].trim();
-      const listPattern = isOrdered ? /^\d+\.\s+/ : /^[\*\-\+]\s+/;
+      const listPattern = isOrdered ? /^\d+\.\s+/ : /^[*\-+]\s/;
       
       if (!listPattern.test(line)) break;
       
-      const content = line.replace(listPattern, '');
+      const content = line.replace(listPattern, '').trim();
 
-      // Skip empty list items
-      if (!content.trim()) {
-        currentIndex++;
+      // Always increment currentIndex first
+      currentIndex++;
+
+      // Skip empty list items - check if content is empty after trimming
+      if (!content) {
         continue;
       }
+
       const richText = this.parseRichText(content);
 
       // Only add list item if it has content after processing
@@ -290,8 +292,6 @@ export class MarkdownToNotion {
           }
         });
       }
-      
-      currentIndex++;
     }
     
     return {
@@ -315,7 +315,7 @@ export class MarkdownToNotion {
       }
       
       // Headers
-      if (line.match(/^#{1,3}\s+/)) {
+      if (line.match(/^#{1,6}\s+/)) {
         const level = line.match(/^#+/)![0].length;
         const content = line.replace(/^#+\s+/, '');
         const headingType = `heading_${Math.min(level, 3)}`;
@@ -368,7 +368,7 @@ export class MarkdownToNotion {
         i = result.endIndex;
       }
       // Unordered lists
-      else if (line.match(/^[\*\-\+]\s+/)) {
+      else if (line.match(/^[*\-+]\s+/) || line.match(/^[*\-+]\s*$/)) {
         const result = this.parseList(lines, i, false);
         blocks.push(...result.blocks);
         i = result.endIndex;
@@ -386,7 +386,7 @@ export class MarkdownToNotion {
         i++;
       }
       // Horizontal rules
-      else if (line.match(/^[\-\*_]{3,}$/)) {
+      else if (line.match(/^[-*_]{3,}$/)) {
         blocks.push({
           object: 'block',
           type: 'divider',
@@ -397,7 +397,7 @@ export class MarkdownToNotion {
       // Regular paragraphs
       else {
         // Collect consecutive lines for the paragraph
-        let paragraphLines = [line];
+        const paragraphLines = [line];
         let nextIndex = i + 1;
         
         while (nextIndex < lines.length) {
@@ -407,9 +407,9 @@ export class MarkdownToNotion {
               nextLine.startsWith('```') ||
               nextLine.includes('|') ||
               nextLine.match(/^\d+\.\s+/) ||
-              nextLine.match(/^[\*\-\+]\s+/) ||
+              nextLine.match(/^[*\-+]\s+/) ||
               nextLine.startsWith('> ') ||
-              nextLine.match(/^[\-\*_]{3,}$/)) {
+              nextLine.match(/^[-*_]{3,}$/)) {
             break;
           }
           paragraphLines.push(nextLine);
