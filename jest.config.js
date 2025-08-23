@@ -17,14 +17,8 @@ module.exports = {
     '!src/cli.ts' // Exclude CLI from coverage as it's harder to test
   ],
   coverageDirectory: 'coverage',
-  coverageReporters: [
-    'text',
-    'lcov',
-    'html'
-  ],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   testTimeout: 10000,
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   forceExit: true,
   detectOpenHandles: true,
   clearMocks: true,
