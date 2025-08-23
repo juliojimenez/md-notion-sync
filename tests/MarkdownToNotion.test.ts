@@ -173,7 +173,7 @@ Second paragraph.`;
       const blocks = converter.convert(markdown);
 
       expect(blocks[0].paragraph.rich_text).toEqual([
-        { type: 'text', text: { content: 'See  for more.' } }
+        { type: 'text', text: { content: 'See for more.' } }
       ]);
     });
 
@@ -182,7 +182,7 @@ Second paragraph.`;
       const blocks = converter.convert(markdown);
 
       expect(blocks[0].paragraph.rich_text).toEqual([
-        { type: 'text', text: { content: 'Here is an image: ' } }
+        { type: 'text', text: { content: 'Here is an image:' } }
       ]);
     });
 
@@ -191,7 +191,7 @@ Second paragraph.`;
       const blocks = converter.convert(markdown);
 
       expect(blocks[0].paragraph.rich_text).toEqual([
-        { type: 'text', text: { content: 'Click  here.' } }
+        { type: 'text', text: { content: 'Click here.' } }
       ]);
     });
   });
