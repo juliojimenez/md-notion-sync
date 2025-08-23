@@ -1,4 +1,4 @@
-name: Test
+name: Tests
 
 on:
   push:
@@ -10,6 +10,7 @@ jobs:
   test:
     name: Test on Node.js ${{ matrix.node-version }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     
     strategy:
       matrix:
@@ -37,9 +38,10 @@ jobs:
 
       - name: Run tests
         run: |
-          npm run test:ci
-          echo "Tests completed with exit code: $?"
-        timeout-minutes: 5
+          echo "🚀 Starting tests..."
+          npm run test:ci || exit $?
+          echo "✅ Tests completed successfully"
+        timeout-minutes: 3
 
       - name: Upload coverage to Codecov
         if: matrix.node-version == 18
