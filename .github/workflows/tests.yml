@@ -89,7 +89,7 @@ jobs:
       - name: Test CLI installation
         run: |
           npm pack
-          npm install -g ./markdown-notion-sync-*.tgz
+          npm install -g ./md-notion-sync-*.tgz
           
       - name: Test CLI help
         run: md-notion-sync --help
