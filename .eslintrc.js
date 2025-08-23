@@ -1,12 +1,15 @@
 module.exports = {
+  parser: '@typescript-eslint/parser',
+  extends: [
+    'eslint:recommended',
+    '@typescript-eslint/recommended'
+  ],
+  plugins: ['@typescript-eslint'],
   env: {
     node: true,
     es2020: true,
     jest: true
   },
-  extends: [
-    'eslint:recommended'
-  ],
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: 'module'
@@ -15,14 +18,39 @@ module.exports = {
     // Allow console.log in source files since it's used for CLI output
     'no-console': 'off',
     
+    // Allow any types for Notion API compatibility
+    '@typescript-eslint/no-explicit-any': 'off',
+    
+    // Allow non-null assertions for cases where we know values exist
+    '@typescript-eslint/no-non-null-assertion': 'off',
+    
     // Prefer const over let when possible
     'prefer-const': 'error',
     
-    // Allow unused variables for now (common in TypeScript)
-    'no-unused-vars': 'off',
+    // Require semicolons
+    '@typescript-eslint/semi': ['error', 'always'],
     
-    // Allow undefined variables (TypeScript will catch these)
-    'no-undef': 'off'
+    // Enforce consistent spacing
+    'object-curly-spacing': ['error', 'always'],
+    'array-bracket-spacing': ['error', 'never'],
+    
+    // Enforce consistent quotes
+    'quotes': ['error', 'single', { 'avoidEscape': true }],
+    
+    // No unused variables (but allow unused function parameters with underscore prefix)
+    '@typescript-eslint/no-unused-vars': ['error', { 
+      'argsIgnorePattern': '^_',
+      'varsIgnorePattern': '^_'
+    }],
+    
+    // Enforce consistent interface naming
+    '@typescript-eslint/naming-convention': [
+      'error',
+      {
+        'selector': 'interface',
+        'format': ['PascalCase']
+      }
+    ]
   },
   ignorePatterns: [
     'dist/',
