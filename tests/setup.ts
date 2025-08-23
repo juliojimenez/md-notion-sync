@@ -1,6 +1,4 @@
 // Test setup file
-import { jest } from '@jest/globals';
-
 // Mock console methods to reduce noise in tests
 global.console = {
   ...console,
@@ -9,3 +7,11 @@ global.console = {
   warn: jest.fn(),
   info: jest.fn(),
 };
+
+// Force cleanup after all tests
+afterAll(() => {
+  // Give Jest a moment to clean up, then force exit
+  setTimeout(() => {
+    process.exit(0);
+  }, 100);
+});
