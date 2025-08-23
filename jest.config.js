@@ -1,5 +1,3 @@
-const { clear } = require("console");
-
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
