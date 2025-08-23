@@ -36,6 +36,7 @@ jobs:
 
       - name: Run tests
         run: npm run test:ci
+        timeout-minutes: 10
 
       - name: Upload coverage to Codecov
         if: matrix.node-version == 18

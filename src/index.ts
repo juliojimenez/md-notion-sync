@@ -81,8 +81,6 @@ export class MarkdownToNotion {
     // First pass: remove unwanted link types completely
     let processedText = text;
     
-    console.log('Original text:', text);
-    
     // More comprehensive regex patterns for removal
     // Remove nested image-links: [![alt](img-url)](link-url)
     processedText = processedText.replace(/\[!\[[^\]]*\]\([^)]*\)\]\([^)]*\)/g, '');
@@ -98,8 +96,6 @@ export class MarkdownToNotion {
     
     // Clean up any double spaces and trim
     processedText = processedText.replace(/\s+/g, ' ').trim();
-    
-    console.log('Final processed text:', processedText);
     
     // If after all removals the text is empty or just whitespace, return empty array
     if (!processedText || processedText.trim() === '') {
