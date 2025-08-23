@@ -270,17 +270,18 @@ export class MarkdownToNotion {
     
     while (currentIndex < lines.length) {
       const line = lines[currentIndex].trim();
-      const listPattern = isOrdered ? /^\d+\.\s+/ : /^[*\-+]\s+/;
+      const listPattern = isOrdered ? /^\d+\.\s+/ : /^[\*\-\+]\s+/;
       
       if (!listPattern.test(line)) break;
       
-      const content = line.replace(listPattern, '');
+      const content = line.replace(listPattern, '').trim(); // Added .trim() here
 
-      // Skip empty list items
-      if (!content.trim()) {
+      // Skip empty list items - check if content is empty after trimming
+      if (!content) {
         currentIndex++;
         continue;
       }
+      
       const richText = this.parseRichText(content);
 
       // Only add list item if it has content after processing
