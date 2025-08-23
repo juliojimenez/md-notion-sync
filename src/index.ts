@@ -270,19 +270,20 @@ export class MarkdownToNotion {
     
     while (currentIndex < lines.length) {
       const line = lines[currentIndex].trim();
-      const listPattern = isOrdered ? /^\d+\.\s+/ : /^[*\-+]\s+/;
+      const listPattern = isOrdered ? /^\d+\.\s+/ : /^[*\-+]\s/;
       
       if (!listPattern.test(line)) break;
       
-      const content = line.replace(listPattern, '').trim(); // Added .trim() here
+      const content = line.replace(listPattern, '').trim();
 
+      // Always increment currentIndex first
       currentIndex++;
-      
+
       // Skip empty list items - check if content is empty after trimming
       if (!content) {
         continue;
       }
-      
+
       const richText = this.parseRichText(content);
 
       // Only add list item if it has content after processing
@@ -295,8 +296,6 @@ export class MarkdownToNotion {
           }
         });
       }
-      
-      currentIndex++;
     }
     
     return {
@@ -373,7 +372,7 @@ export class MarkdownToNotion {
         i = result.endIndex;
       }
       // Unordered lists
-      else if (line.match(/^[*\-+]\s/)) {
+      else if (line.match(/^[*\-+]\s+/) || line.match(/^[*\-+]\s*$/)) {
         const result = this.parseList(lines, i, false);
         blocks.push(...result.blocks);
         i = result.endIndex;
