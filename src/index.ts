@@ -315,7 +315,7 @@ export class MarkdownToNotion {
       }
       
       // Headers
-      if (line.match(/^#{1,3}\s+/)) {
+      if (line.match(/^#{1,6}\s+/)) {
         const level = line.match(/^#+/)![0].length;
         const content = line.replace(/^#+\s+/, '');
         const headingType = `heading_${Math.min(level, 3)}`;
