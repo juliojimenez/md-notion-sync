@@ -270,7 +270,7 @@ export class MarkdownToNotion {
     
     while (currentIndex < lines.length) {
       const line = lines[currentIndex].trim();
-      const listPattern = isOrdered ? /^\d+\.\s+/ : /^[\*\-\+]\s+/;
+      const listPattern = isOrdered ? /^\d+\.\s+/ : /^[*\-+]\s+/;
       
       if (!listPattern.test(line)) break;
       
