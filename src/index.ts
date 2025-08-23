@@ -276,9 +276,10 @@ export class MarkdownToNotion {
       
       const content = line.replace(listPattern, '').trim(); // Added .trim() here
 
+      currentIndex++;
+      
       // Skip empty list items - check if content is empty after trimming
       if (!content) {
-        currentIndex++;
         continue;
       }
       
