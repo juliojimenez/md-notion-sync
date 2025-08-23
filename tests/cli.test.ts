@@ -138,7 +138,7 @@ NOTION_TOKEN=your_notion_token_here
           filePath: 'test.md'
         });
       } catch (error) {
-        expect(error.message).toBe('Sync failed');
+        expect((error as Error).message).toBe('Sync failed');
       }
     });
   });
