@@ -1,10 +1,10 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint'],
   extends: [
     'eslint:recommended',
-    '@typescript-eslint/recommended'
+    'plugin:@typescript-eslint/recommended'
   ],
-  plugins: ['@typescript-eslint'],
   env: {
     node: true,
     es2020: true,
@@ -27,35 +27,24 @@ module.exports = {
     // Prefer const over let when possible
     'prefer-const': 'error',
     
-    // Require semicolons
-    '@typescript-eslint/semi': ['error', 'always'],
-    
-    // Enforce consistent spacing
-    'object-curly-spacing': ['error', 'always'],
-    'array-bracket-spacing': ['error', 'never'],
-    
-    // Enforce consistent quotes
-    'quotes': ['error', 'single', { 'avoidEscape': true }],
-    
     // No unused variables (but allow unused function parameters with underscore prefix)
     '@typescript-eslint/no-unused-vars': ['error', { 
       'argsIgnorePattern': '^_',
       'varsIgnorePattern': '^_'
     }],
     
-    // Enforce consistent interface naming
-    '@typescript-eslint/naming-convention': [
-      'error',
-      {
-        'selector': 'interface',
-        'format': ['PascalCase']
-      }
-    ]
+    // Disable base rule as it can report incorrect errors
+    'no-unused-vars': 'off',
+    
+    // Allow require() in test files and build scripts
+    '@typescript-eslint/no-var-requires': 'off'
   },
   ignorePatterns: [
     'dist/',
     'node_modules/',
     'coverage/',
-    '*.js'
+    '*.js',
+    '.eslintrc.js',
+    'jest.config.js'
   ]
 };
