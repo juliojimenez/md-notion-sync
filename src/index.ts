@@ -1,6 +1,6 @@
 import { Client } from '@notionhq/client';
 import fs from 'fs';
-import path from 'path';
+// import path from 'path';
 
 // Define compatible types for Notion blocks
 export interface NotionRichText {
@@ -107,7 +107,7 @@ export class MarkdownToNotion {
     // Now process remaining formatting (bold, italic, code, valid links)
     const parts = processedText.split(/(\*\*[^*]+?\*\*|\*[^*]+?\*|`[^`]+?`|\[[^\]]+?\]\([^)]+?\))/);
     
-    for (let part of parts) {
+    for (const part of parts) {
       if (!part) continue;
       
       if (part.startsWith('**') && part.endsWith('**')) {
@@ -177,7 +177,7 @@ export class MarkdownToNotion {
   }
 
   private parseTable(tableLines: string[]): NotionBlock | null {
-    const rows = tableLines.filter(line => line.trim() && !line.match(/^\|[\s\-\|:]+\|$/));
+    const rows = tableLines.filter(line => line.trim() && !line.match(/^\|[\s\-|:]+\|$/));
     if (rows.length < 2) return null;
     
     const parseRow = (row: string) => {
@@ -219,8 +219,8 @@ export class MarkdownToNotion {
 
   private parseCodeBlock(lines: string[], startIndex: number): { blocks: NotionBlock[]; endIndex: number } {
     let endIndex = startIndex + 1;
-    let language = lines[startIndex].replace(/^```/, '').trim() || 'plain text';
-    let codeContent: string[] = [];
+    const language = lines[startIndex].replace(/^```/, '').trim() || 'plain text';
+    const codeContent: string[] = [];
     
     while (endIndex < lines.length && !lines[endIndex].startsWith('```')) {
       codeContent.push(lines[endIndex]);
@@ -267,7 +267,7 @@ export class MarkdownToNotion {
     
     while (currentIndex < lines.length) {
       const line = lines[currentIndex].trim();
-      const listPattern = isOrdered ? /^\d+\.\s+/ : /^[\*\-\+]\s+/;
+      const listPattern = isOrdered ? /^\d+\.\s+/ : /^[*\-+]\s+/;
       
       if (!listPattern.test(line)) break;
       
@@ -368,7 +368,7 @@ export class MarkdownToNotion {
         i = result.endIndex;
       }
       // Unordered lists
-      else if (line.match(/^[\*\-\+]\s+/)) {
+      else if (line.match(/^[*\-+]\s+/)) {
         const result = this.parseList(lines, i, false);
         blocks.push(...result.blocks);
         i = result.endIndex;
@@ -386,7 +386,7 @@ export class MarkdownToNotion {
         i++;
       }
       // Horizontal rules
-      else if (line.match(/^[\-\*_]{3,}$/)) {
+      else if (line.match(/^[-*_]{3,}$/)) {
         blocks.push({
           object: 'block',
           type: 'divider',
@@ -397,7 +397,7 @@ export class MarkdownToNotion {
       // Regular paragraphs
       else {
         // Collect consecutive lines for the paragraph
-        let paragraphLines = [line];
+        const paragraphLines = [line];
         let nextIndex = i + 1;
         
         while (nextIndex < lines.length) {
@@ -407,9 +407,9 @@ export class MarkdownToNotion {
               nextLine.startsWith('```') ||
               nextLine.includes('|') ||
               nextLine.match(/^\d+\.\s+/) ||
-              nextLine.match(/^[\*\-\+]\s+/) ||
+              nextLine.match(/^[*\-+]\s+/) ||
               nextLine.startsWith('> ') ||
-              nextLine.match(/^[\-\*_]{3,}$/)) {
+              nextLine.match(/^[-*_]{3,}$/)) {
             break;
           }
           paragraphLines.push(nextLine);
