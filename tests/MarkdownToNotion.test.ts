@@ -164,7 +164,7 @@ Second paragraph.`;
       const blocks = converter.convert(markdown);
 
       expect(blocks[0].paragraph.rich_text).toEqual([
-        { type: 'text', text: { content: 'Go to  below.' } }
+        { type: 'text', text: { content: 'Go to below.' } }
       ]);
     });
 
