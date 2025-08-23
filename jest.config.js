@@ -1,3 +1,5 @@
+const { clear } = require("console");
+
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
@@ -21,5 +23,8 @@ module.exports = {
     'html'
   ],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
-  testTimeout: 10000
+  testTimeout: 10000,
+  forceExit: true,
+  detectOpenHandles: true,
+  clearMocks: true
 };
