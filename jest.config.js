@@ -28,7 +28,5 @@ module.exports = {
   forceExit: true,
   detectOpenHandles: true,
   clearMocks: true,
-  restoreMocks: true,
-  silent: false,
-  verbose: true
+  restoreMocks: true
 };
