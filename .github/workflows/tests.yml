@@ -37,11 +37,8 @@ jobs:
         continue-on-error: true
 
       - name: Run tests
-        run: |
-          echo "🚀 Starting tests..."
-          npm run test:ci || exit $?
-          echo "✅ Tests completed successfully"
-        timeout-minutes: 3
+        run: npm run test:ci
+        timeout-minutes: 2
 
       - name: Upload coverage to Codecov
         if: matrix.node-version == 18

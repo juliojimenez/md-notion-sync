@@ -31,7 +31,7 @@
     "test": "jest --forceExit --detectOpenHandles",
     "test:watch": "jest --watch --forceExit",
     "test:coverage": "jest --coverage --forceExit --detectOpenHandles",
-    "test:ci": "jest --ci --coverage --watchAll=false --forceExit --detectOpenHandles --runInBand --no-cache --testTimeout=30000",
+    "test:ci": "jest --ci --coverage --watchAll=false --forceExit",
     "test:simple": "node scripts/run-tests.js",
     "prepublishOnly": "npm run build && npm run test:ci",
     "lint": "eslint src/**/*.ts tests/**/*.ts",

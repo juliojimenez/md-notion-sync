@@ -1,5 +1,3 @@
-const { clear } = require("console");
-
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
@@ -10,6 +8,11 @@ module.exports = {
   ],
   transform: {
     '^.+\\.(ts|tsx)$': 'ts-jest'
+  },
+  globals: {
+    'ts-jest': {
+      tsconfig: 'tsconfig.test.json'
+    }
   },
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
@@ -24,7 +27,5 @@ module.exports = {
   ],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   testTimeout: 10000,
-  forceExit: true,
-  detectOpenHandles: true,
-  clearMocks: true
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node']
 };
