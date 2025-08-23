@@ -1,6 +1,6 @@
-import { syncMarkdownToNotion, MarkdownToNotion, NotionSync } from '../src/index';
+import { syncMarkdownToNotion, MarkdownToNotion } from '../src/index';
 import fs from 'fs';
-import path from 'path';
+// import path from 'path';
 
 // Mock external dependencies
 jest.mock('@notionhq/client');
