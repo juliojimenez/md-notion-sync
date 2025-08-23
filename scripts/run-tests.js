@@ -11,7 +11,6 @@ const jestProcess = spawn('npx', [
   '--watchAll=false',
   '--forceExit',
   '--detectOpenHandles',
-  '--maxWorkers=1',
   '--runInBand',
   '--no-cache'
 ], {
