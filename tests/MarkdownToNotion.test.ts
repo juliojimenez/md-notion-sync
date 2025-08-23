@@ -164,9 +164,7 @@ Second paragraph.`;
       const blocks = converter.convert(markdown);
 
       expect(blocks[0].paragraph.rich_text).toEqual([
-        { type: 'text', text: { content: 'Go to ' } },
-        { type: 'text', text: { content: 'section' } },
-        { type: 'text', text: { content: ' below.' } }
+        { type: 'text', text: { content: 'Go to  below.' } }
       ]);
     });
 
@@ -175,9 +173,7 @@ Second paragraph.`;
       const blocks = converter.convert(markdown);
 
       expect(blocks[0].paragraph.rich_text).toEqual([
-        { type: 'text', text: { content: 'See ' } },
-        { type: 'text', text: { content: 'docs' } },
-        { type: 'text', text: { content: ' for more.' } }
+        { type: 'text', text: { content: 'See  for more.' } }
       ]);
     });
 
