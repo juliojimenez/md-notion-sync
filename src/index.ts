@@ -57,18 +57,20 @@ export class MarkdownToNotion {
       return false; // Skip these types of links
     }
     
+    let processedUrl = url;
+    
     // Ensure URL has a protocol
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       if (url.includes('.') && !url.includes(' ') && url.length > 3) {
-        url = 'https://' + url; // Add https:// to domain-like strings
+        processedUrl = 'https://' + url; // Add https:// to domain-like strings
       } else {
         return false; // Skip invalid URLs
       }
     }
     
     try {
-      new URL(url);
-      return url;
+      new URL(processedUrl);
+      return processedUrl; // Return the processed URL with protocol
     } catch {
       return false;
     }
@@ -147,13 +149,14 @@ export class MarkdownToNotion {
         const linkUrl = linkMatch[2];
         
         // Double-check that this isn't an unwanted link type
+        const validUrl = this.isValidUrl(linkUrl);
         if (!linkUrl.startsWith('#') && 
             !linkUrl.startsWith('./') && 
             !linkUrl.startsWith('../') &&
-            this.isValidUrl(linkUrl)) {
+            validUrl) {
           richText.push({
             type: 'text',
-            text: { content: linkText, link: { url: linkUrl } }
+            text: { content: linkText, link: { url: validUrl } }
           });
         } else {
           // If it's an unwanted link, just add the text content
