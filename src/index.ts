@@ -372,7 +372,7 @@ export class MarkdownToNotion {
         i = result.endIndex;
       }
       // Unordered lists
-      else if (line.match(/^[*\-+]\s+/)) {
+      else if (line.match(/^[*\-+]\s/)) {
         const result = this.parseList(lines, i, false);
         blocks.push(...result.blocks);
         i = result.endIndex;
