@@ -9,6 +9,7 @@ env:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    name: Sync README to Notion
     steps:
       - uses: actions/checkout@v3
       
