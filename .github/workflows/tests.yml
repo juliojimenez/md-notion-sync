@@ -111,7 +111,7 @@ jobs:
       - name: Test CLI sync validation
         run: |
           # Test that sync command fails without required params
-          if node ../package/dist/cli.js sync -f test.md 2>/dev/null; then
+          if node dist/cli.js sync -f test.md 2>/dev/null; then
             echo "ERROR: Command should have failed without page-id"
             exit 1
           else
