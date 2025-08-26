@@ -92,10 +92,14 @@ jobs:
       - name: Test CLI installation
         run: |
           npm pack
-          npm install -g ./md-notion-sync-*.tgz
+          # Install locally and add to PATH instead of global install
+          tar -xzf md-notion-sync-*.tgz
+          chmod +x package/dist/cli.js
           
       - name: Test CLI help
-        run: md-notion-sync --help
+        run: |
+          # Run the CLI directly from the extracted package
+          node package/dist/cli.js --help
 
       - name: Test CLI init
         run: |
@@ -103,3 +107,13 @@ jobs:
           cd test-dir
           md-notion-sync init
           test -f .env
+
+      - name: Test CLI sync validation
+        run: |
+          # Test that sync command fails without required params
+          if node ../package/dist/cli.js sync -f test.md 2>/dev/null; then
+            echo "ERROR: Command should have failed without page-id"
+            exit 1
+          else
+            echo "✅ Command correctly failed without required page-id parameter"
+          fi
