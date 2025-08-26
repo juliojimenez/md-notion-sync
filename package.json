@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "@notionhq/client": "^4.0.2",
-    "commander": "^11.0.0",
+    "commander": "^14.0.0",
     "dotenv": "^17.2.1"
   },
   "devDependencies": {
