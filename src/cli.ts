@@ -12,8 +12,8 @@ const program = new Command();
 
 program
   .name('md-notion-sync')
-  .description('Sync markdown files to Notion pages with proper formatting')
-  .version('1.0.0');
+  .description('Sync markdown files to Notion pages.')
+  .version('1.0.1');
 
 program
   .command('sync')
