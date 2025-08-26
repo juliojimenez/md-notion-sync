@@ -3,9 +3,6 @@ on:
   push:
     paths: ['README.md']
 
-env:
-  NOTION_PAGE_ID: 25b2bd19f29080cc9cb9cbce7f24c471
-
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -22,6 +19,6 @@ jobs:
         run: npm install -g md-notion-sync
       
       - name: Sync to Notion
-        run: md-notion-sync sync -f README.md -p ${{ env.NOTION_PAGE_ID }}
+        run: md-notion-sync sync -f README.md -p ${{ secrets.NOTION_PAGE_ID }}
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_SYNC }}
