@@ -32,7 +32,7 @@ md-notion-sync init
 ```
 
 2. Edit the generated `.env` file with your Notion token:
-```env
+```
 NOTION_TOKEN=your_notion_integration_token_here
 ```
 
