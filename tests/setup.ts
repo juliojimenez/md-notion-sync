@@ -1,9 +1,9 @@
-// Test setup file
-import { jest } from '@jest/globals';
+// Test setup file - properly mock console to prevent hanging
+const originalConsole = global.console;
 
-// Mock console methods to reduce noise in tests
+// Mock console methods to prevent hanging issues
 global.console = {
-  ...console,
+  ...originalConsole,
   log: jest.fn(),
   error: jest.fn(),
   warn: jest.fn(),
