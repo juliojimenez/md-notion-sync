@@ -94,7 +94,7 @@ jobs:
           npm pack
           # Install locally and add to PATH instead of global install
           tar -xzf md-notion-sync-*.tgz
-          chmod +x package/dist/cli.js
+          chmod +x dist/cli.js
           
       - name: Test CLI help
         run: |
