@@ -28,7 +28,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "test": "jest --forceExit --detectOpenHandles",
+    "test": "jest --forceExit --detectOpenHandles --verbose",
     "test:watch": "jest --watch --forceExit",
     "test:coverage": "jest --coverage --forceExit --detectOpenHandles",
     "test:ci": "jest --ci --coverage --watchAll=false --forceExit",

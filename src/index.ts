@@ -78,6 +78,7 @@ export class MarkdownToNotion {
 
   private parseRichText(text: string): RichTextElement[] {
     const richText: RichTextElement[] = [];
+    
     // First pass: remove unwanted link types completely
     let processedText = text;
     
@@ -94,8 +95,8 @@ export class MarkdownToNotion {
     // Remove relative path links: [text](./path) or [text](../path)
     processedText = processedText.replace(/\[[^\]]+\]\(\.{0,2}\/[^)]*\)/g, '');
     
-    // Clean up any double spaces and trim
-    processedText = processedText.replace(/\s+/g, ' ').trim();
+    // Convert newlines to spaces for paragraph text (key fix!)
+    processedText = processedText.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
     
     // If after all removals the text is empty or just whitespace, return empty array
     if (!processedText || processedText.trim() === '') {
@@ -103,13 +104,14 @@ export class MarkdownToNotion {
     }
     
     // Now process remaining formatting (bold, italic, code, valid links)
-    const parts = processedText.split(/(\*\*[^*]+?\*\*|\*[^*]+?\*|`[^`]+?`|\[[^\]]+?\]\([^)]+?\))/);
+    // Split on formatting patterns but be more careful with unclosed ones
+    const parts = processedText.split(/(\*\*[^*]*?\*\*|\*[^*]*?\*|`[^`]*?`|\[[^\]]+?\]\([^)]+?\))/);
     
     for (const part of parts) {
       if (!part) continue;
       
-      if (part.startsWith('**') && part.endsWith('**')) {
-        // Bold text
+      if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
+        // Bold text - only if properly closed
         const content = part.slice(2, -2);
         if (content) {
           richText.push({
@@ -118,8 +120,8 @@ export class MarkdownToNotion {
             annotations: { bold: true }
           });
         }
-      } else if (part.startsWith('*') && part.endsWith('*') && !part.startsWith('**')) {
-        // Italic text
+      } else if (part.startsWith('*') && part.endsWith('*') && !part.startsWith('**') && part.length > 2) {
+        // Italic text - only if properly closed
         const content = part.slice(1, -1);
         if (content) {
           richText.push({
@@ -128,8 +130,8 @@ export class MarkdownToNotion {
             annotations: { italic: true }
           });
         }
-      } else if (part.startsWith('`') && part.endsWith('`')) {
-        // Inline code
+      } else if (part.startsWith('`') && part.endsWith('`') && part.length > 2) {
+        // Inline code - only if properly closed
         const content = part.slice(1, -1);
         if (content) {
           richText.push({
@@ -139,7 +141,7 @@ export class MarkdownToNotion {
           });
         }
       } else if (part.match(/\[([^\]]+)\]\(([^)]+)\)/)) {
-        // Links - but only valid ones
+        // Links - but only valid ones and properly closed
         const linkMatch = part.match(/\[([^\]]+)\]\(([^)]+)\)/)!;
         const linkText = linkMatch[1];
         const linkUrl = linkMatch[2];
@@ -162,7 +164,7 @@ export class MarkdownToNotion {
           });
         }
       } else {
-        // Plain text
+        // Plain text - include everything else (including unclosed formatting)
         if (part.trim()) {
           richText.push({
             type: 'text',
@@ -266,18 +268,35 @@ export class MarkdownToNotion {
     
     while (currentIndex < lines.length) {
       const line = lines[currentIndex].trim();
-      const listPattern = isOrdered ? /^\d+\.\s+/ : /^[*\-+]\s/;
       
-      if (!listPattern.test(line)) break;
+      let isListItem = false;
+      if (isOrdered) {
+        isListItem = line.match(/^\d+\.\s+/) !== null;
+      } else {
+        isListItem = line.match(/^[*\-+]\s+/) !== null || line.match(/^[*\-+]\s*$/) !== null;
+      }
       
-      const content = line.replace(listPattern, '').trim();
+      if (!isListItem) {
+        break;
+      }
 
-      // Always increment currentIndex first
       currentIndex++;
-
-      // Skip empty list items - check if content is empty after trimming
-      if (!content) {
-        continue;
+      
+      let content = '';
+      if (isOrdered && line.match(/^\d+\.\s+/)) {
+        content = line.replace(/^\d+\.\s+/, '').trim();
+      } else if (!isOrdered) {
+        if (line.match(/^[*\-+]\s+/)) {
+          content = line.replace(/^[*\-+]\s+/, '').trim();
+        } else if (line.match(/^[*\-+]\s*$/)) {
+          // This handles "- " or "-" cases (empty list items)
+          content = '';
+        }
+      }
+      
+      // Skip empty list items (this is the key behavior the test expects)
+      if (!content || content === '') {
+        continue; // Skip but keep looping since we already incremented currentIndex
       }
 
       const richText = this.parseRichText(content);
@@ -351,13 +370,14 @@ export class MarkdownToNotion {
           i = tableIndex;
         } else {
           // Fallback to paragraph if table parsing fails
-          blocks.push({
-            object: 'block',
-            type: 'paragraph',
-            paragraph: {
-              rich_text: this.parseRichText(line)
-            }
-          });
+          const richText = this.parseRichText(line);
+          if (richText.length > 0) {
+            blocks.push({
+              object: 'block',
+              type: 'paragraph',
+              paragraph: { rich_text: richText }
+            });
+          }
           i++;
         }
       }
@@ -367,7 +387,7 @@ export class MarkdownToNotion {
         blocks.push(...result.blocks);
         i = result.endIndex;
       }
-      // Unordered lists
+      // Unordered lists  
       else if (line.match(/^[*\-+]\s+/) || line.match(/^[*\-+]\s*$/)) {
         const result = this.parseList(lines, i, false);
         blocks.push(...result.blocks);
@@ -376,13 +396,14 @@ export class MarkdownToNotion {
       // Blockquotes
       else if (line.startsWith('> ')) {
         const content = line.replace(/^>\s*/, '');
-        blocks.push({
-          object: 'block',
-          type: 'quote',
-          quote: {
-            rich_text: this.parseRichText(content)
-          }
-        });
+        const richText = this.parseRichText(content);
+        if (richText.length > 0) {
+          blocks.push({
+            object: 'block',
+            type: 'quote',
+            quote: { rich_text: richText }
+          });
+        }
         i++;
       }
       // Horizontal rules
@@ -403,11 +424,11 @@ export class MarkdownToNotion {
         while (nextIndex < lines.length) {
           const nextLine = lines[nextIndex].trim();
           if (!nextLine || 
-              nextLine.match(/^#{1,3}\s+/) ||
+              nextLine.match(/^#{1,6}\s+/) ||
               nextLine.startsWith('```') ||
-              nextLine.includes('|') ||
+              (nextLine.includes('|') && lines[nextIndex + 1] && lines[nextIndex + 1].includes('|')) ||
               nextLine.match(/^\d+\.\s+/) ||
-              nextLine.match(/^[*\-+]\s+/) ||
+              nextLine.match(/^[*\-+]\s+/) || nextLine.match(/^[*\-+]\s*$/) ||
               nextLine.startsWith('> ') ||
               nextLine.match(/^[-*_]{3,}$/)) {
             break;
@@ -416,6 +437,7 @@ export class MarkdownToNotion {
           nextIndex++;
         }
         
+        // Join lines with newlines, parseRichText will handle converting to spaces
         const paragraphContent = paragraphLines.join('\n');
         const richText = this.parseRichText(paragraphContent);
         
@@ -433,6 +455,7 @@ export class MarkdownToNotion {
         i = nextIndex;
       }
     }
+    
     return blocks;
   }
 }

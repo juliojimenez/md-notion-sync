@@ -18,9 +18,12 @@ module.exports = {
   ],
   coverageDirectory: 'coverage',
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
-  testTimeout: 10000,
+  testTimeout: 5000,
   forceExit: true,
   detectOpenHandles: true,
   clearMocks: true,
-  restoreMocks: true
+  restoreMocks: true,
+  maxWorkers: 1, // Run tests serially to isolate hangs
+  verbose: true,
+  bail: 1, // Stop on first failure to identify hanging tests faster
 };
