@@ -99,7 +99,7 @@ jobs:
       - name: Test CLI help
         run: |
           # Run the CLI directly from the extracted package
-          node package/dist/cli.js --help
+          node dist/cli.js --help
 
       - name: Test CLI init
         run: |
