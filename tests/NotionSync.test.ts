@@ -1,4 +1,4 @@
-import { NotionSync, NotionBlock } from '../src/index';
+import { NotionSync } from '../src/index';
 // import { Client } from '@notionhq/client';
 
 // Mock the Notion client
