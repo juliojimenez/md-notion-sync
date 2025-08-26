@@ -105,8 +105,16 @@ jobs:
         run: |
           mkdir test-dir
           cd test-dir
-          md-notion-sync init
+          # Run init command
+          node dist/src/cli.js init
           test -f .env
+          # Verify .env content
+          grep -q "NOTION_TOKEN" .env
+
+      - name: Test CLI version
+        run: |
+          # Test version command
+          node dist/src/cli.js --version
 
       - name: Test CLI sync validation
         run: |
