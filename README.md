@@ -188,7 +188,3 @@ The package includes comprehensive error handling for:
 - Network failures
 - Notion API rate limits
 - Invalid page IDs
-
-## License
-
-Apache-2.0 License - see LICENSE file for details.
