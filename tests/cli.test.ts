@@ -147,8 +147,8 @@ NOTION_TOKEN=your_notion_token_here
     test('has correct program metadata', () => {
       const programConfig = {
         name: 'md-notion-sync',
-        description: 'Sync markdown files to Notion pages with proper formatting',
-        version: '1.0.0'
+        description: 'Sync markdown files to Notion pages.',
+        version: '1.0.1'
       };
 
       expect(programConfig.name).toBe('md-notion-sync');
