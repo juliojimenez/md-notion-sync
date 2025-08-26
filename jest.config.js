@@ -7,7 +7,9 @@ module.exports = {
     '**/*.(test|spec).+(ts|tsx|js)'
   ],
   transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest'
+    '^.+\\.(ts|tsx)$': ['ts-jest', {
+      tsconfig: './tsconfig.json'
+    }]
   },
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
@@ -15,11 +17,13 @@ module.exports = {
     '!src/cli.ts' // Exclude CLI from coverage as it's harder to test
   ],
   coverageDirectory: 'coverage',
-  coverageReporters: [
-    'text',
-    'lcov',
-    'html'
-  ],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
-  testTimeout: 10000
+  testTimeout: 5000,
+  forceExit: true,
+  detectOpenHandles: true,
+  clearMocks: true,
+  restoreMocks: true,
+  maxWorkers: 1, // Run tests serially to isolate hangs
+  verbose: true,
+  bail: 1, // Stop on first failure to identify hanging tests faster
 };

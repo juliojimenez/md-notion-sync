@@ -1,0 +1,24 @@
+name: Sync README to Notion
+on:
+  push:
+    paths: ['README.md']
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    name: Sync README to Notion
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install package
+        run: npm install -g md-notion-sync
+      
+      - name: Sync to Notion
+        run: md-notion-sync sync -f README.md -p ${{ secrets.NOTION_PAGE_ID }}
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_SYNC }}

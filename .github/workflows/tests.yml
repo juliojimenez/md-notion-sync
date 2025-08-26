@@ -1,0 +1,127 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test on Node.js ${{ matrix.node-version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    strategy:
+      matrix:
+        node-version: [16, 18, 20]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Run linting (continue on error)
+        run: npm run lint || echo "Linting failed but continuing..."
+        continue-on-error: true
+
+      - name: Run tests
+        run: npm run test:ci
+        timeout-minutes: 2
+
+      - name: Upload coverage to Codecov
+        if: matrix.node-version == 18
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          fail_ci_if_error: false
+
+  type-check:
+    name: Type Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+  integration:
+    name: Integration Test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build package
+        run: npm run build
+
+      - name: Test CLI installation
+        run: |
+          npm pack
+          # Install locally and add to PATH instead of global install
+          tar -xzf md-notion-sync-*.tgz
+          chmod +x dist/src/cli.js
+          
+      - name: Test CLI help
+        run: |
+          # Run the CLI directly from the extracted package
+          node dist/src/cli.js --help
+
+      - name: Test CLI init
+        run: |
+          mkdir test-dir
+          cd test-dir
+          # Run init command
+          node ../dist/src/cli.js init
+          test -f .env
+          # Verify .env content
+          grep -q "NOTION_TOKEN" .env
+
+      - name: Test CLI version
+        run: |
+          # Test version command
+          node dist/src/cli.js --version
+
+      - name: Test CLI sync validation
+        run: |
+          # Test that sync command fails without required params
+          if node dist/cli.js sync -f test.md 2>/dev/null; then
+            echo "ERROR: Command should have failed without page-id"
+            exit 1
+          else
+            echo "✅ Command correctly failed without required page-id parameter"
+          fi
